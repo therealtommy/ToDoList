@@ -1,11 +1,8 @@
 package com.example.todolist
-
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +20,10 @@ class ListActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
+        val taskDao = AppDatabase.getDatabase(application).taskDao()
+        val factory = TaskViewModelFactory(taskDao)
+        taskViewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
+
         taskViewModel.allTasks.observe(this, { tasks ->
             tasks?.let { adapter.submitList(it) }
         })
